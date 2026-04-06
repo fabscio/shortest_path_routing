@@ -122,42 +122,42 @@ public class GameView extends BaseView {
     router1 = createImageViewElement("/router_icon.png", 63.1, 80.2);
     applyPosition(router1, 38.5, 262.1);
     addElementTo(router1, layout);
-    router1Label = createLabel(59.9, 22.5, 109.1, 297.9);
+    router1Label = createLabel("TENTATIVE", 100.0, 22.5, 20.0, 350.0);
 
     router2 = createImageViewElement("/router_icon.png", 63.1, 80.2);
     applyPosition(router2, 229.6, 70.0);
     addElementTo(router2, layout);
-    router2Label = createLabel(59.9, 22.5, 234.4, 156.2);
+    router2Label = createLabel("TENTATIVE", 100.0, 22.5, 206.6, 156.2);
 
     router3 = createImageViewElement("/router_icon.png", 63.1, 80.2);
     applyPosition(router3, 907.3, 70.0);
     addElementTo(router3, layout);
-    router3Label = createLabel(59.9, 22.5, 910.5, 156.2);
+    router3Label = createLabel("TENTATIVE", 100.0, 22.5, 888.1, 156.2);
 
     router4 = createImageViewElement("/router_icon.png", 63.1, 80.2);
     applyPosition(router4, 1098.4, 262.1);
     addElementTo(router4, layout);
-    router4Label = createLabel(59.9, 22.5, 1030.9, 287.9);
+    router4Label = createLabel("TENTATIVE", 100.0, 22.5, 1080.0, 350.0);
 
     router5 = createImageViewElement("/router_icon.png", 63.1, 80.2);
     applyPosition(router5, 420.7, 261.1);
     addElementTo(router5, layout);
-    router5Label = createLabel(59.9, 22.5, 347.1, 287.9);
+    router5Label = createLabel("TENTATIVE", 100.0, 22.5, 402.2, 350.0);
 
     router6 = createImageViewElement("/router_icon.png", 63.1, 80.2);
     applyPosition(router6, 716.2, 261.1);
     addElementTo(router6, layout);
-    router6Label = createLabel(59.9, 22.5, 784.6, 287.9);
+    router6Label = createLabel("TENTATIVE", 100.0, 22.5, 693.2, 350.0);
 
     router7 = createImageViewElement("/router_icon.png", 63.1, 80.2);
     applyPosition(router7, 232.8, 452.4);
     addElementTo(router7, layout);
-    router7Label = createLabel(59.9, 22.5, 232.8, 432.1);
+    router7Label = createLabel("TENTATIVE", 100.0, 22.5, 206.6, 538.6);
 
     router8 = createImageViewElement("/router_icon.png", 63.1, 80.2);
     applyPosition(router8, 910.5, 452.4);
     addElementTo(router8, layout);
-    router8Label = createLabel(59.9, 22.5, 910.5, 423.1);
+    router8Label = createLabel("TENTATIVE", 100.0, 22.5, 888.1, 538.6);
 
     startButton = createButton("/start_button.png", 182.3, 39.3, 638.3, 627.3);
     addElementTo(startButton, layout);
