@@ -87,8 +87,8 @@ public class Network implements Runnable{
    * ........... selectedVersion is the routing algorithm.
    * Return: object of a Network
    ******************************************************************* */
-  public Network(int routersAmount, int[][] nodes, int selectedVersion){
-    this.routers = configureRouters(routersAmount, selectedVersion);
+  public Network(int routersAmount, int[][] nodes){
+    this.routers = configureRouters(routersAmount);
     this.links = estabilishLinks(nodes);
   }
 
@@ -165,11 +165,11 @@ public class Network implements Runnable{
    * Parameters: amount is total routers, selectedVersion is algorithm.
    * Return: List of instantiated routers
    ******************************************************************* */
-  private List<Router> configureRouters(int amount, int selectedVersion){
+  private List<Router> configureRouters(int amount){
     List<Router> initializedRouters = new ArrayList<>();
 
     for(int i = 0; i < amount ; i++){
-      Router r = new Router(i + 1, selectedVersion);
+      Router r = new Router(i + 1);
       initializedRouters.add(r);
 
       Thread t = new Thread(r);

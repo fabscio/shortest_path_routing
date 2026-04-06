@@ -78,8 +78,6 @@ public class GameController extends BaseController implements PropertyChangeList
   private final int transmissionRouterId;     // Source node origin
   private final int receiverRouterId;         // Final destination node
   private final int ttl;                      // Packet lifetime configuration
-  private final int selectedVersion;          // Chosen algorithm version
-
   /*********************************************************************
    * Method: GameController
    * Function: constructor for the game controller.
@@ -87,16 +85,14 @@ public class GameController extends BaseController implements PropertyChangeList
    * ........... selectedTtl is time limit, topology is graph, selectedVersion.
    * Return: object of a GameController
    ******************************************************************* */
-  public GameController(Stage stage, int tId, int rId, int selectedTtl, NetworkTopology topology, int selectedVersion) {
+  public GameController(Stage stage, int tId, int rId, int selectedTtl, NetworkTopology topology) {
     super(stage);
     this.view = new GameView();
     this.topology = topology;
     this.transmissionRouterId = tId;
     this.receiverRouterId = rId;
     this.ttl = selectedTtl;
-    this.selectedVersion = selectedVersion;
-
-    this.network = new Network(topology.getNumRouters(), topology.getNodes(), this.selectedVersion);
+    this.network = new Network(topology.getNumRouters(), topology.getNodes());
 
     configureNetwork(this.network);
     setupInteractions();
@@ -160,17 +156,13 @@ public class GameController extends BaseController implements PropertyChangeList
     ImageView packet = view.createNewPacket(routerK.getLayoutX(), routerK.getLayoutY());
     Label ttlLabel;
 
-    if(this.selectedVersion == 1 || this.selectedVersion == 2){
-      ttlLabel = new Label("");
-    } else {
-      ttlLabel = new Label("TTL: " + ttlText);
-    }
+    ttlLabel = new Label("TTL: " + ttlText);
 
     ttlLabel.setStyle("-fx-text-fill: black; -fx-font-weight: bold; -fx-font-size: 14px;");
     ttlLabel.setLayoutX(routerK.getLayoutX());
     ttlLabel.setLayoutY(routerK.getLayoutY() + 30);
 
-    Pane parentPane = (javafx.scene.layout.Pane) packet.getParent();
+    Pane parentPane = (Pane) packet.getParent();
     parentPane.getChildren().add(ttlLabel);
 
     view.bringRoutersToFront();
@@ -189,6 +181,10 @@ public class GameController extends BaseController implements PropertyChangeList
     });
 
     timeline.play();
+  }
+
+  private void changeLinkLabel(){
+
   }
 
   /*********************************************************************

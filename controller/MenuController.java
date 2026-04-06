@@ -98,47 +98,6 @@ public class MenuController extends BaseController {
   @Override
   protected void setupInteractions() {
 
-    view.getVersionOneButton().setOnAction(e -> selectVersion(1));
-    view.getVersionTwoButton().setOnAction(e -> selectVersion(2));
-    view.getVersionThreeButton().setOnAction(e -> selectVersion(3));
-    view.getVersionFourButton().setOnAction(e -> selectVersion(4));
-
-    view.getChangeButton().setOnAction(e -> {
-      view.getVersionOneButton().setVisible(true);
-      view.getVersionTwoButton().setVisible(true);
-      view.getVersionThreeButton().setVisible(true);
-      view.getVersionFourButton().setVisible(true);
-      this.selectedVersion = 1;
-    });
-
-    view.getAboutButton().setOnAction(e -> {
-      Alert alert = new Alert(Alert.AlertType.INFORMATION);
-      alert.setTitle("About Algorithm");
-      alert.setHeaderText("Algorithm Version " + selectedVersion);
-
-      String description = "";
-
-      switch (selectedVersion) {
-        case 1:
-          description = "Each packet that arrives in a router is sent to every network interface of this router.";
-          break;
-        case 2:
-          description = "Each packet that arrives in a router is sent to every network interface of this router but the one that it arrived from.";
-          break;
-        case 3:
-          description = "Each packet that arrives in a router is sent to every network interface of this router but the one that it arrived from. And each router checks the TTL to decide if the packet should be send forward.";
-          break;
-        case 4:
-          description = "The source router puts a sequence number in each packet and each router has a list per source router telling which sequence numbers originating at that source have already been seen.\n" +
-            "When a packet comes in, the router checks it on the list, if it finds, it is not flooded and is discarded, if not, it is flooded.";
-          break;
-      }
-
-      alert.setContentText(description);
-      alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-      alert.showAndWait();
-    });
-
     view.getStartButton().setOnAction(e -> {
       try {
         int transmitterId = view.getTransmissorChoiceBox().getValue();
@@ -155,7 +114,7 @@ public class MenuController extends BaseController {
         }
 
         int ttl = Integer.parseInt(view.getTtlInput().getText());
-        setInterface(new GameController(stage, transmitterId, receptorId, ttl, topology, selectedVersion).getView());
+        setInterface(new GameController(stage, transmitterId, receptorId, ttl, topology).getView());
 
       } catch (NumberFormatException ex) {
         System.out.println("Invalid TTL entered. Defaulting to 10.");
@@ -166,23 +125,9 @@ public class MenuController extends BaseController {
           return;
         }
 
-        setInterface(new GameController(stage, transmitterId, receptorId, 10, topology, selectedVersion).getView());
+        setInterface(new GameController(stage, transmitterId, receptorId, 10, topology).getView());
       }
     });
-  }
-
-  /*********************************************************************
-   * Method: selectVersion
-   * Function: updates internal version state and hides unselected buttons.
-   * Parameters: version is the chosen algorithm integer.
-   * Return: void
-   ******************************************************************* */
-  private void selectVersion(int version) {
-    this.selectedVersion = version;
-    view.getVersionOneButton().setVisible(version == 1);
-    view.getVersionTwoButton().setVisible(version == 2);
-    view.getVersionThreeButton().setVisible(version == 3);
-    view.getVersionFourButton().setVisible(version == 4);
   }
 
   /*********************************************************************

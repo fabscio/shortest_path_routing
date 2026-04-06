@@ -72,8 +72,7 @@ import util.TopologyReader;
 
 public class MenuView extends BaseView {
 
-  private Button startButton, changeButton, aboutButton;                              // Basic interaction controls
-  private Button versionOneButton, versionTwoButton, versionThreeButton, versionFourButton; // Algorithm selection
+  private Button startButton;                                                         // Basic interaction controls
   private ChoiceBox<Integer> transmissorChoiceBox, receptorChoiceBox;                 // Origin and Destination inputs
   private ObservableList<Integer> routersLabels = FXCollections.observableArrayList(1, 2, 3, 4, 5, 6, 7, 8); // Selections
   private TextField ttlInput;                                                         // Custom time allowance
@@ -96,50 +95,27 @@ public class MenuView extends BaseView {
    * Return: void
    ******************************************************************* */
   private void setInterfaceElements(){
-    startButton = createButton("start_button.png", 182.3, 50.4, 937.1, 192.5);
+    startButton = createButton("start_button.png", 182.3, 50.4, 672.9, 272.9);
     addElementTo(startButton, layout);
 
-    changeButton = createButton("change_button.png", 182.3, 39.4, 937.1, 360.9);
-    addElementTo(changeButton, layout);
-
-    aboutButton = createButton("about_button.png", 192.3, 39.4, 937.1, 283.4);
-    addElementTo(aboutButton, layout);
-
     transmissorChoiceBox = createIntegerChoiceBox(routersLabels, 69.0, 39.4);
-    applyPosition(transmissorChoiceBox, 1050.4, 428.3);
+    applyPosition(transmissorChoiceBox, 782.8, 364.3);
     addElementTo(transmissorChoiceBox, layout);
 
     receptorChoiceBox = createIntegerChoiceBox(routersLabels, 69.0, 39.4);
-    applyPosition(receptorChoiceBox, 1050.4, 490.8);
+    applyPosition(receptorChoiceBox, 782.8, 426.8);
     addElementTo(receptorChoiceBox, layout);
 
     ttlInput = createTextField("10", 69.0, 32.5);
-    applyPosition(ttlInput, 1052.3, 561.6);
+    applyPosition(ttlInput, 782.8, 497.5);
     addElementTo(ttlInput, layout);
 
-    versionOneButton = createButton("/version_one_icon.png", 124.0,119.1, 610.0, 256.8);
-    addElementTo(versionOneButton, layout);
-
-    versionTwoButton = createButton("/version_two_icon.png", 124.0, 108.2, 777.8, 268.4);
-    addElementTo(versionTwoButton, layout);
-
-    versionThreeButton = createButton("/version_three_icon.png", 124.0, 113.7, 610.0, 415.2);
-    addElementTo(versionThreeButton, layout);
-
-    versionFourButton = createButton("/version_four_icon.png", 124.0, 113.7, 777.8, 415.2);
-    addElementTo(versionFourButton, layout);
   }
 
   // Getters Section
   public Button getStartButton(){ return startButton; }
-  public Button getChangeButton(){ return changeButton; }
-  public Button getAboutButton(){ return aboutButton; }
   public TextField getTtlInput() { return ttlInput; }
   public ChoiceBox<Integer> getTransmissorChoiceBox() { return transmissorChoiceBox; }
   public ChoiceBox<Integer> getReceptorChoiceBox() { return receptorChoiceBox; }
   public ObservableList<Integer> getRoutersLabels() { return routersLabels; }
-  public Button getVersionOneButton() { return versionOneButton; }
-  public Button getVersionTwoButton() { return versionTwoButton; }
-  public Button getVersionThreeButton() { return versionThreeButton; }
-  public Button getVersionFourButton() { return versionFourButton; }
 }

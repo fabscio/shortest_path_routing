@@ -74,7 +74,6 @@ import util.TopologyReader;
 public class Router implements Runnable {
 
   private final int id;                                            // Router's unique identifier
-  private final int selectedVersion;                               // Selected flooding algorithm version
   private final PropertyChangeSupport support;                     // Support for UI property change events
   private final List<Link> links;                                  // List of connected network links
   private final BlockingQueue<Packet> inbox;                       // Thread-safe queue for incoming packets
@@ -88,9 +87,8 @@ public class Router implements Runnable {
    * ........... algorithm chosen.
    * Return: object of a Router
    ******************************************************************* */
-  public Router(int id, int selectedVersion){
+  public Router(int id){
     this.id = id;
-    this.selectedVersion = selectedVersion;
     this.links = new ArrayList<>();
     this.inbox = new LinkedBlockingQueue<>();
     this.support = new PropertyChangeSupport(this);

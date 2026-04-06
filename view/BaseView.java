@@ -225,6 +225,26 @@ public abstract class BaseView {
     return text;
   }
 
+  protected Label createLabel(double width, double height, double x, double y) {
+    Label label = new Label();
+    label.setPrefWidth(width);
+    label.setPrefHeight(height);
+    label.setStyle("-fx-text-fill: white; -fx-background-color: #2c3e50; -fx-alignment: center; -fx-font-weight: bold; -fx-font-size: 12px; -fx-background-radius: 5px; -fx-border-color: black; -fx-border-radius: 5px;");
+    applyPosition(label, x, y);
+    addElementTo(label, layout);
+    return label;
+  }
+
+  protected Label createLabel(String text, double width, double height, double x, double y) {
+    Label label = new Label(text);
+    label.setPrefWidth(width);
+    label.setPrefHeight(height);
+    label.setStyle("-fx-text-fill: white; -fx-background-color: #2c3e50; -fx-alignment: center; -fx-font-weight: bold; -fx-font-size: 12px; -fx-background-radius: 5px; -fx-border-color: black; -fx-border-radius: 5px;");
+    applyPosition(label, x, y);
+    addElementTo(label, layout);
+    return label;
+  }
+
   /*********************************************************************
    * Method: applyPosition
    * Function: anchors an element layout.
