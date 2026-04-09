@@ -2,10 +2,10 @@
  * Author............: Fabricio da Silva Souza
  * Registration......: 202411217
  * Beginning.........: 28/03/2026
- * Last change.......:
+ * Last change.......: 09/04/2026
  * Program's name....: Router.java
- * Program's function: Receive packets and forward them to other
- * ................... routers through the link
+ * Program's function: Receive packets and route them using Dijkstra's
+ * ................... shortest path algorithm.
  ************************************************************** */
 
 package model;
@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Arrays;
 
 // ==========================================
 // JAVAFX IMPORTS
@@ -52,6 +53,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -79,14 +81,13 @@ public class Router implements Runnable {
   private final BlockingQueue<Packet> inbox;                       // Thread-safe queue for incoming packets
   private volatile boolean isRunning = true;                       // Flag to control the main execution loop
   private final HashMap<Integer, List<Integer>> seenPacketsLedger; // Memory ledger for processed packets
-  private int[][] adjacencyMatrix;
-  private int totalRouters;
+  private int[][] adjacencyMatrix;                                 // Network representation for math
+  private int totalRouters;                                        // Total number of nodes
 
   /*********************************************************************
    * Method: Router
    * Function: constructor of a router.
-   * Parameters: id is the router's id and selectedVersion is the
-   * ........... algorithm chosen.
+   * Parameters: id is the router's id.
    * Return: object of a Router
    ******************************************************************* */
   public Router(int id){
@@ -114,7 +115,6 @@ public class Router implements Runnable {
         }
 
         shortestPathRouting(incomingPacket);
-
         Thread.sleep(10);
 
       } catch (Exception e){
@@ -125,13 +125,83 @@ public class Router implements Runnable {
   }
 
   /*********************************************************************
-   * Method: shortestPathRouting
-   * Function: executes the shortest path Dijkstra's algorithm
-   * Parameters: incomingPacket is the packet to process.
+   * Method: loadTopologyForDijkstra
+   * Function: prepares the routing table by converting edges to a matrix.
+   * Parameters: topology is the structural graph of the network.
    * Return: void
    ******************************************************************* */
-  public void shortestPathRouting(Packet incomingPacket){
-    // 1. If we reached the final destination, shout SUCCESS!
+  public void loadTopologyForDijkstra(NetworkTopology topology) {
+    this.totalRouters = topology.getNumRouters();
+    this.adjacencyMatrix = new int[totalRouters][totalRouters];
+
+    for (int[] edge : topology.getNodes()) {
+      int rA = edge[0] - 1;
+      int rB = edge[1] - 1;
+      int weight = edge[2];
+
+      this.adjacencyMatrix[rA][rB] = weight;
+      this.adjacencyMatrix[rB][rA] = weight;
+    }
+  }
+
+  /*********************************************************************
+   * Method: receivePacket
+   * Function: places an incoming packet into the router's inbox queue.
+   * Parameters: packet is the payload being received.
+   * Return: void
+   ******************************************************************* */
+  public void receivePacket(Packet packet){
+    this.inbox.offer(packet);
+  }
+
+  /*********************************************************************
+   * Method: stopRouter
+   * Function: safely terminates the router's execution thread.
+   * Parameters: none.
+   * Return: void
+   ******************************************************************* */
+  public void stopRouter() {
+    this.isRunning = false;
+    this.inbox.offer(new Packet(0, 0, 0, 0));
+  }
+
+  /*********************************************************************
+   * Method: addLink
+   * Function: adds a network link to the router's physical connections.
+   * Parameters: newLink is the connection to be added.
+   * Return: void
+   ******************************************************************* */
+  public void addLink(Link newLink){
+    this.links.add(newLink);
+  }
+
+  /*********************************************************************
+   * Method: addPropertyChangeListener
+   * Function: attaches a listener to monitor UI updates.
+   * Parameters: pcl is the listener to be attached.
+   * Return: void
+   ******************************************************************* */
+  public void addPropertyChangeListener(PropertyChangeListener pcl) {
+    support.addPropertyChangeListener(pcl);
+  }
+
+  /*********************************************************************
+   * Method: getId
+   * Function: retrieves the router's identifier.
+   * Parameters: none.
+   * Return: int representing the router's id.
+   ******************************************************************* */
+  public int getId(){
+    return this.id;
+  }
+
+  /*********************************************************************
+   * Method: shortestPathRouting
+   * Function: controls flow of Dijkstra math and packet forwarding.
+   * Parameters: incomingPacket is the packet to evaluate.
+   * Return: void
+   ******************************************************************* */
+  private void shortestPathRouting(Packet incomingPacket){
     if (this.id == incomingPacket.getDestinationRouterId()) {
       support.firePropertyChange("SUCCESS", this.id, null);
       return;
@@ -153,19 +223,16 @@ public class Router implements Runnable {
     }
   }
 
-  public void loadTopologyForDijkstra(NetworkTopology topology) {
-    this.totalRouters = topology.getNumRouters();
-    this.adjacencyMatrix = new int[totalRouters][totalRouters];
-    for (int[] edge : topology.getNodes()) {
-      int rA = edge[0] - 1; int rB = edge[1] - 1; int weight = edge[2];
-      this.adjacencyMatrix[rA][rB] = weight;
-      this.adjacencyMatrix[rB][rA] = weight;
-    }
-  }
-
+  /*********************************************************************
+   * Method: getNextHopDijkstra
+   * Function: calculates optimal path and triggers UI visualization.
+   * Parameters: sourceId is origin, targetId is destination, visualize flag.
+   * Return: int identifier of the next router hop.
+   ******************************************************************* */
   private int getNextHopDijkstra(int sourceId, int targetId, boolean visualize) {
     int INFINITY = 1000000000;
-    int s = sourceId - 1; int t = targetId - 1;
+    int s = sourceId - 1;
+    int t = targetId - 1;
 
     class NodeState {
       int predecessor = -1; int length = INFINITY; boolean isPermanent = false;
@@ -187,7 +254,6 @@ public class Router implements Runnable {
       for (int i = 0; i < this.totalRouters; i++) {
         if (this.adjacencyMatrix[k][i] != 0 && !state[i].isPermanent) {
 
-          // 1. Draw the white dashed line to explore the adjacent neighbor
           if (visualize) {
             int[] exploreData = {k + 1, i + 1};
             support.firePropertyChange("EXPLORE_LINK", 0, exploreData);
@@ -198,7 +264,6 @@ public class Router implements Runnable {
             state[i].predecessor = k;
             state[i].length = state[k].length + this.adjacencyMatrix[k][i];
 
-            // 2. Update the [distance, predecessor] label under the link!
             if (visualize) {
               int[] labelData = {k + 1, i + 1, state[i].length, k + 1};
               support.firePropertyChange("UPDATE_LINK_LABEL", 0, labelData);
@@ -219,7 +284,6 @@ public class Router implements Runnable {
 
       if (k == -1) break;
 
-      // 3. Mark the smallest one as the new Permanent
       state[k].isPermanent = true;
       if (visualize) {
         support.firePropertyChange("ROUTER_PERMANENT", k + 1, null);
@@ -240,8 +304,24 @@ public class Router implements Runnable {
     return -1;
   }
 
-  private void sleep(int millis) {
-    try { Thread.sleep(millis); } catch (InterruptedException ignored) {}
+  /*********************************************************************
+   * Method: sendPacketTo
+   * Function: packages event data and dispatches packet after delay.
+   * Parameters: destinationRouter is the target, packet is the payload.
+   * Return: void
+   ******************************************************************* */
+  private void sendPacketTo(Router destinationRouter, Packet packet){
+    int[] packetData = { destinationRouter.getId(), packet.getTTL() };
+    support.firePropertyChange("PACKET_SENT", this.id, packetData);
+
+    new Thread(() -> {
+      try {
+        Thread.sleep(750);
+        destinationRouter.receivePacket(packet);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }).start();
   }
 
   /*********************************************************************
@@ -268,77 +348,12 @@ public class Router implements Runnable {
   }
 
   /*********************************************************************
-   * Method: sendPacketTo
-   * Function: forwards a packet to a destination router after a delay.
-   * Parameters: destinationRouter is the target, packet is the payload.
+   * Method: sleep
+   * Function: pauses thread execution to allow UI animations.
+   * Parameters: millis is time in milliseconds.
    * Return: void
    ******************************************************************* */
-  public void sendPacketTo(Router destinationRouter, Packet packet){
-    // 2. Pack the Destination ID and the TTL into an array
-    int[] packetData = { destinationRouter.getId(), packet.getTTL() };
-
-    // 3. Fire the correct "PACKET_SENT" event the controller is waiting for
-    support.firePropertyChange("PACKET_SENT", this.id, packetData);
-
-    new Thread(() -> {
-      try {
-        Thread.sleep(750);
-        destinationRouter.receivePacket(packet);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }).start();
+  private void sleep(int millis) {
+    try { Thread.sleep(millis); } catch (InterruptedException ignored) {}
   }
-
-  /*********************************************************************
-   * Method: receivePacket
-   * Function: places an incoming packet into the router's inbox queue.
-   * Parameters: packet is the packet being received.
-   * Return: void
-   ******************************************************************* */
-  public void receivePacket(Packet packet){
-    this.inbox.offer(packet);
-  }
-
-  /*********************************************************************
-   * Method: stopRouter
-   * Function: safely terminates the router's execution thread.
-   * Parameters: none.
-   * Return: void
-   ******************************************************************* */
-  public void stopRouter() {
-    this.isRunning = false;
-    this.inbox.offer(new Packet(0, 0, 0, 0));
-  }
-
-  /*********************************************************************
-   * Method: addLink
-   * Function: adds a network link to the router's connections.
-   * Parameters: newLink is the connection to be added.
-   * Return: void
-   ******************************************************************* */
-  public void addLink(Link newLink){
-    this.links.add(newLink);
-  }
-
-  /*********************************************************************
-   * Method: addPropertyChangeListener
-   * Function: attaches a listener to monitor property changes for the UI.
-   * Parameters: pcl is the listener to be attached.
-   * Return: void
-   ******************************************************************* */
-  public void addPropertyChangeListener(PropertyChangeListener pcl) {
-    support.addPropertyChangeListener(pcl);
-  }
-
-  /*********************************************************************
-   * Method: getId
-   * Function: retrieves the router's identifier.
-   * Parameters: none.
-   * Return: int representing the router's id.
-   ******************************************************************* */
-  public int getId(){
-    return this.id;
-  }
-
 }

@@ -2,7 +2,7 @@
  * Author............: Fabricio da Silva Souza
  * Registration......: 202411217
  * Beginning.........: 28/03/2026
- * Last change.......:
+ * Last change.......: 09/04/2026
  * Program's name....: Packet
  * Program's function: Store information and stamps
  ************************************************************** */
@@ -51,6 +51,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -72,13 +73,13 @@ import util.TopologyReader;
 
 public class Packet {
 
-  public static AtomicInteger globalPacketCount = new AtomicInteger(0); // Global counter for all generated packets
+  public static AtomicInteger globalPacketCount = new AtomicInteger(0);
 
-  private final int transmitterRouterId;                                // ID of the originating router
-  private final int sequenceNumber;                                     // Unique sequence stamp for Version 4
-  private final int receptorRouterId;                                   // ID of the final destination
-  private int previousRouterId;                                         // ID of the last router to forward this packet
-  private int ttl;                                                      // Time-To-Live counter to prevent infinite loops
+  private final int transmitterRouterId;
+  private final int sequenceNumber;
+  private final int receptorRouterId;
+  private int previousRouterId;
+  private int ttl;
 
   /*********************************************************************
    * Method: Packet
@@ -131,9 +132,7 @@ public class Packet {
    * Parameters: none.
    * Return: int representing the TTL.
    ******************************************************************* */
-  public int getTTL(){
-    return this.ttl;
-  }
+  public int getTTL(){ return this.ttl; }
 
   /*********************************************************************
    * Method: getSourceRouterId
@@ -141,9 +140,7 @@ public class Packet {
    * Parameters: none.
    * Return: int representing the origin id.
    ******************************************************************* */
-  public int getSourceRouterId() {
-    return this.transmitterRouterId;
-  }
+  public int getSourceRouterId() { return this.transmitterRouterId; }
 
   /*********************************************************************
    * Method: getSequenceNumber
@@ -151,9 +148,7 @@ public class Packet {
    * Parameters: none.
    * Return: int representing the sequence number.
    ******************************************************************* */
-  public int getSequenceNumber() {
-    return this.sequenceNumber;
-  }
+  public int getSequenceNumber() { return this.sequenceNumber; }
 
   /*********************************************************************
    * Method: getDestinationRouterId
@@ -161,9 +156,7 @@ public class Packet {
    * Parameters: none.
    * Return: int representing the destination id.
    ******************************************************************* */
-  public int getDestinationRouterId(){
-    return this.receptorRouterId;
-  }
+  public int getDestinationRouterId(){ return this.receptorRouterId; }
 
   /*********************************************************************
    * Method: getPreviousRouterId
@@ -171,8 +164,6 @@ public class Packet {
    * Parameters: none.
    * Return: int representing the previous router id.
    ******************************************************************* */
-  public int getPreviousRouterId(){
-    return this.previousRouterId;
-  }
+  public int getPreviousRouterId(){ return this.previousRouterId; }
 
 }

@@ -2,7 +2,7 @@
  * Author............: Fabricio da Silva Souza
  * Registration......: 202411217
  * Beginning.........: 28/03/2026
- * Last change.......:
+ * Last change.......: 28/03/2026
  * Program's name....: Principal
  * Program's function: Start the whole application
  *************************************************************** */

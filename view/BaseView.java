@@ -2,7 +2,7 @@
  * Author............: Fabricio da Silva Souza
  * Registration......: 202411217
  * Beginning.........: 28/03/2026
- * Last change.......:
+ * Last change.......: 09/04/2026
  * Program's name....: BaseView
  * Program's function: super class that works as base for all views
  *************************************************************** */
@@ -72,10 +72,10 @@ import util.TopologyReader;
 
 public abstract class BaseView {
 
-  protected final AnchorPane layout;            // Base container for elements
-  private final String imgPathPrefix;           // Path reference for graphics
-  private final double NORMAL_SCALE = 1.0;      // Standard graphic size
-  private final double HOVER_SCALE = 1.2;       // Expanded graphic size for interaction
+  protected final AnchorPane layout;
+  private final String imgPathPrefix;
+  private final double NORMAL_SCALE = 1.0;
+  private final double HOVER_SCALE = 1.2;
 
   /*********************************************************************
    * Method: BaseView
@@ -88,6 +88,10 @@ public abstract class BaseView {
     this.layout = createLayout();
   }
 
+  // -------------------------------------------------------------------
+  // PUBLIC HIGH-LEVEL METHODS
+  // -------------------------------------------------------------------
+
   /*********************************************************************
    * Method: getLayout
    * Function: retrieves the parent configuration node.
@@ -97,6 +101,10 @@ public abstract class BaseView {
   public Parent getLayout(){
     return this.layout;
   }
+
+  // -------------------------------------------------------------------
+  // PROTECTED/PRIVATE LOW-LEVEL HELPERS & BUILDERS
+  // -------------------------------------------------------------------
 
   /*********************************************************************
    * Method: createLayout
@@ -118,6 +126,17 @@ public abstract class BaseView {
    ******************************************************************* */
   protected void addElementTo(Node node, AnchorPane pane){
     pane.getChildren().add(node);
+  }
+
+  /*********************************************************************
+   * Method: applyPosition
+   * Function: anchors an element layout.
+   * Parameters: node is object to place, x and y are locations.
+   * Return: void
+   ******************************************************************* */
+  protected void applyPosition(Node node, double x, double y){
+    AnchorPane.setLeftAnchor(node, x);
+    AnchorPane.setTopAnchor(node, y);
   }
 
   /*********************************************************************
@@ -173,7 +192,6 @@ public abstract class BaseView {
     if(!options.isEmpty()){
       choiceBox.setValue(options.get(0));
     }
-
     return choiceBox;
   }
 
@@ -191,7 +209,6 @@ public abstract class BaseView {
     if(!options.isEmpty()){
       choiceBox.setValue(options.get(0));
     }
-
     return choiceBox;
   }
 
@@ -225,6 +242,12 @@ public abstract class BaseView {
     return text;
   }
 
+  /*********************************************************************
+   * Method: createLabel (Empty Text)
+   * Function: constructs a default styled label.
+   * Parameters: width, height, x, y.
+   * Return: Label configured element.
+   ******************************************************************* */
   protected Label createLabel(double width, double height, double x, double y) {
     Label label = new Label();
     label.setPrefWidth(width);
@@ -235,6 +258,12 @@ public abstract class BaseView {
     return label;
   }
 
+  /*********************************************************************
+   * Method: createLabel (With Text)
+   * Function: constructs a populated styled label.
+   * Parameters: text is string, width, height, x, y.
+   * Return: Label configured element.
+   ******************************************************************* */
   protected Label createLabel(String text, double width, double height, double x, double y) {
     Label label = new Label(text);
     label.setPrefWidth(width);
@@ -246,29 +275,14 @@ public abstract class BaseView {
   }
 
   /*********************************************************************
-   * Method: applyPosition
-   * Function: anchors an element layout.
-   * Parameters: node is object to place, x and y are locations.
-   * Return: void
-   ******************************************************************* */
-  protected void applyPosition(Node node, double x, double y){
-    AnchorPane.setLeftAnchor(node, x);
-    AnchorPane.setTopAnchor(node, y);
-  }
-
-  /*********************************************************************
    * Method: addHoverEffectTo
    * Function: implements size scaling mouse interactions.
    * Parameters: node is object to hover.
    * Return: void
    ******************************************************************* */
   protected void addHoverEffectTo(Node node){
-    node.setOnMouseEntered(e -> {
-      scaleElement(node, HOVER_SCALE);
-    });
-    node.setOnMouseExited(e -> {
-      scaleElement(node, NORMAL_SCALE);
-    });
+    node.setOnMouseEntered(e -> scaleElement(node, HOVER_SCALE));
+    node.setOnMouseExited(e -> scaleElement(node, NORMAL_SCALE));
   }
 
   /*********************************************************************
@@ -291,5 +305,4 @@ public abstract class BaseView {
   protected void makeTransparent(Region component){
     component.setBackground(Background.EMPTY);
   }
-
 }

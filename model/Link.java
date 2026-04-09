@@ -2,7 +2,7 @@
  * Author............: Fabricio da Silva Souza
  * Registration......: 202411217
  * Beginning.........: 28/03/2026
- * Last change.......:
+ * Last change.......: 09/04/2026
  * Program's name....: Link
  * Program's function: establish a link between two routers
  ************************************************************** */
@@ -51,6 +51,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -72,9 +73,9 @@ import util.TopologyReader;
 
 public class Link {
 
-  private final int weight;      // The cost or distance of the connection
-  private final Router routerK;  // First router endpoint
-  private final Router routerJ;  // Second router endpoint
+  private final int weight;
+  private final Router routerK;
+  private final Router routerJ;
 
   /*********************************************************************
    * Method: Link
@@ -98,15 +99,17 @@ public class Link {
     return (router == this.routerJ) ? this.routerK : this.routerJ;
   }
 
+  // -------------------------------------------------------------------
+  // PUBLIC GETTERS
+  // -------------------------------------------------------------------
+
   /*********************************************************************
    * Method: getWeight
    * Function: retrieves the connection cost.
    * Parameters: none.
    * Return: int representing the link weight.
    ******************************************************************* */
-  public int getWeight() {
-    return this.weight;
-  }
+  public int getWeight() { return this.weight; }
 
   /*********************************************************************
    * Method: getRouterK
@@ -114,9 +117,7 @@ public class Link {
    * Parameters: none.
    * Return: object of a Router
    ******************************************************************* */
-  public Router getRouterK() {
-    return this.routerK;
-  }
+  public Router getRouterK() { return this.routerK; }
 
   /*********************************************************************
    * Method: getRouterJ
@@ -124,8 +125,6 @@ public class Link {
    * Parameters: none.
    * Return: object of a Router
    ******************************************************************* */
-  public Router getRouterJ() {
-    return this.routerJ;
-  }
+  public Router getRouterJ() { return this.routerJ; }
 
 }

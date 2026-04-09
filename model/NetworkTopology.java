@@ -2,7 +2,7 @@
  * Author............: Fabricio da Silva Souza
  * Registration......: 202411217
  * Beginning.........: 28/03/2026
- * Last change.......:
+ * Last change.......: 09/04/2026
  * Program's name....: NetworkTopology
  * Program's function: Hold the topology read in the backbone.txt
  * ................... by the TopologyReader
@@ -52,6 +52,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -73,8 +74,8 @@ import util.TopologyReader;
 
 public class NetworkTopology {
 
-  private final int numRouters; // Total number of routers in the network
-  private final int[][] nodes;  // Matrix defining connections and weights
+  private final int numRouters;
+  private final int[][] nodes;
 
   /*********************************************************************
    * Method: NetworkTopology

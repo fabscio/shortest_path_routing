@@ -2,7 +2,7 @@
  * Author............: Fabricio da Silva Souza
  * Registration......: 202411217
  * Beginning.........: 28/03/2026
- * Last change.......:
+ * Last change.......: 09/04/2026
  * Program's name....: MenuView
  * Program's function: Create the elements of the menu interface.
  *************************************************************** */
@@ -72,10 +72,10 @@ import util.TopologyReader;
 
 public class MenuView extends BaseView {
 
-  private Button startButton;                                                         // Basic interaction controls
-  private ChoiceBox<Integer> transmissorChoiceBox, receptorChoiceBox;                 // Origin and Destination inputs
-  private ObservableList<Integer> routersLabels = FXCollections.observableArrayList(1, 2, 3, 4, 5, 6, 7, 8); // Selections
-  private TextField ttlInput;                                                         // Custom time allowance
+  private Button startButton;
+  private ChoiceBox<Integer> transmissorChoiceBox, receptorChoiceBox;
+  private ObservableList<Integer> routersLabels = FXCollections.observableArrayList(1, 2, 3, 4, 5, 6, 7, 8);
+  private TextField ttlInput;
 
   /*********************************************************************
    * Method: MenuView
@@ -87,6 +87,20 @@ public class MenuView extends BaseView {
     super("/img/menu/");
     setInterfaceElements();
   }
+
+  // -------------------------------------------------------------------
+  // PUBLIC GETTERS
+  // -------------------------------------------------------------------
+
+  public Button getStartButton(){ return startButton; }
+  public TextField getTtlInput() { return ttlInput; }
+  public ChoiceBox<Integer> getTransmissorChoiceBox() { return transmissorChoiceBox; }
+  public ChoiceBox<Integer> getReceptorChoiceBox() { return receptorChoiceBox; }
+  public ObservableList<Integer> getRoutersLabels() { return routersLabels; }
+
+  // -------------------------------------------------------------------
+  // PRIVATE LOW-LEVEL BUILDERS
+  // -------------------------------------------------------------------
 
   /*********************************************************************
    * Method: setInterfaceElements
@@ -109,13 +123,5 @@ public class MenuView extends BaseView {
     ttlInput = createTextField("10", 69.0, 32.5);
     applyPosition(ttlInput, 782.8, 497.5);
     addElementTo(ttlInput, layout);
-
   }
-
-  // Getters Section
-  public Button getStartButton(){ return startButton; }
-  public TextField getTtlInput() { return ttlInput; }
-  public ChoiceBox<Integer> getTransmissorChoiceBox() { return transmissorChoiceBox; }
-  public ChoiceBox<Integer> getReceptorChoiceBox() { return receptorChoiceBox; }
-  public ObservableList<Integer> getRoutersLabels() { return routersLabels; }
 }

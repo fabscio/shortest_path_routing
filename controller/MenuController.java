@@ -2,7 +2,7 @@
  * Author............: Fabricio da Silva Souza
  * Registration......: 202411217
  * Beginning.........: 28/03/2026
- * Last change.......:
+ * Last change.......: 09/04/2026
  * Program's name....: MenuController
  * Program's function: Control the elements from the menu interface.
  *************************************************************** */
@@ -72,9 +72,9 @@ import util.TopologyReader;
 
 public class MenuController extends BaseController {
 
-  private final MenuView view;           // Interface associated with the menu
-  private final NetworkTopology topology;// Parsed configuration of the network
-  private int selectedVersion = 1;       // Version of routing logic selected
+  private final MenuView view;
+  private final NetworkTopology topology;
+  private int selectedVersion = 1;
 
   /*********************************************************************
    * Method: MenuController
@@ -87,6 +87,17 @@ public class MenuController extends BaseController {
     this.topology = topology;
     this.view = new MenuView();
     setupInteractions();
+  }
+
+  /*********************************************************************
+   * Method: getView
+   * Function: retrieves the managed interface view.
+   * Parameters: none.
+   * Return: object of a BaseView
+   ******************************************************************* */
+  @Override
+  public BaseView getView(){
+    return this.view;
   }
 
   /*********************************************************************
@@ -128,16 +139,5 @@ public class MenuController extends BaseController {
         setInterface(new GameController(stage, transmitterId, receptorId, 10, topology).getView());
       }
     });
-  }
-
-  /*********************************************************************
-   * Method: getView
-   * Function: retrieves the managed interface view.
-   * Parameters: none.
-   * Return: object of a BaseView
-   ******************************************************************* */
-  @Override
-  public BaseView getView(){
-    return this.view;
   }
 }

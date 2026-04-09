@@ -2,7 +2,7 @@
  * Author............: Fabricio da Silva Souza
  * Registration......: 202411217
  * Beginning.........: 28/03/2026
- * Last change.......:
+ * Last change.......: 09/04/2026
  * Program's name....: Network
  * Program's function: Configures the routers and links and starts
  * ................... the transmission.
@@ -20,12 +20,12 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Arrays;
 
 // ==========================================
 // JAVAFX IMPORTS
@@ -53,6 +53,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -79,17 +80,15 @@ public class Network implements Runnable{
   private int transmitterRouterId;        // ID of the router starting the flood
   private int receptorRouterId;           // ID of the final destination router
   private int ttl;                        // Initial Time-To-Live for genesis packets
-  private int currentSequenceNumber = 1;  // Tracker for Version 4 distinct transmissions
+  private int currentSequenceNumber = 1;  // Tracker for distinct transmissions
 
   /*********************************************************************
    * Method: Network
    * Function: constructor to initialize the simulation network.
-   * Parameters: routersAmount is the node count, nodes is the matrix,
-   * ........... selectedVersion is the routing algorithm.
+   * Parameters: routersAmount is the node count, nodes is the matrix.
    * Return: object of a Network
    ******************************************************************* */
   public Network(int routersAmount, int[][] nodes){
-    // UPDATE: Pass the 'nodes' array down into configureRouters!
     this.routers = configureRouters(routersAmount, nodes);
     this.links = estabilishLinks(nodes);
   }
@@ -164,21 +163,16 @@ public class Network implements Runnable{
   /*********************************************************************
    * Method: configureRouters
    * Function: instantiates and starts threads for all routers.
-   * Parameters: amount is total routers, selectedVersion is algorithm.
+   * Parameters: amount is total routers, nodes is connection matrix.
    * Return: List of instantiated routers
    ******************************************************************* */
   private List<Router> configureRouters(int amount, int[][] nodes){
     List<Router> initializedRouters = new ArrayList<>();
-
-    // NEW: Create a temporary topology wrapper just for the routers to read
     NetworkTopology tempTopology = new NetworkTopology(amount, nodes);
 
     for(int i = 0; i < amount ; i++){
       Router r = new Router(i + 1);
-
-      // CRITICAL FIX: Inject the map into the router's brain!
       r.loadTopologyForDijkstra(tempTopology);
-
       initializedRouters.add(r);
 
       Thread t = new Thread(r);
@@ -210,8 +204,8 @@ public class Network implements Runnable{
 
   /*********************************************************************
    * Method: establishLink
-   * Function: creates a single 'bidirectional connection between two nodes.
-   * Parameters: routerK is the first node, routerJ is the second, weight.
+   * Function: creates a single bidirectional connection between two nodes.
+   * Parameters: routerK is first node, routerJ is second, weight.
    * Return: object of a Link
    ******************************************************************* */
   private Link establishLink(Router routerK, Router routerJ, int weight) throws IllegalArgumentException{
@@ -220,5 +214,4 @@ public class Network implements Runnable{
     routerJ.addLink(newLink);
     return newLink;
   }
-
 }

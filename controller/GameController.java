@@ -2,7 +2,7 @@
  * Author............: Fabricio da Silva Souza
  * Registration......: 202411217
  * Beginning.........: 28/03/2026
- * Last change.......:
+ * Last change.......: 09/04/2026
  * Program's name....: GameController
  * Program's function: Control the elements from the game interface,
  * ................... animate the elements, and glue the network
@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Arrays;
 
 // ==========================================
 // JAVAFX IMPORTS
@@ -52,6 +53,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -70,6 +72,7 @@ import controller.BaseController;
 import controller.GameController;
 import controller.MenuController;
 import util.TopologyReader;
+
 public class GameController extends BaseController implements PropertyChangeListener {
 
   private final GameView view;                // Interface associated with the game
@@ -78,11 +81,12 @@ public class GameController extends BaseController implements PropertyChangeList
   private final int transmissionRouterId;     // Source node origin
   private final int receiverRouterId;         // Final destination node
   private final int ttl;                      // Packet lifetime configuration
+
   /*********************************************************************
    * Method: GameController
    * Function: constructor for the game controller.
    * Parameters: stage is the window, tId is source, rId is destination,
-   * ........... selectedTtl is time limit, topology is graph, selectedVersion.
+   * ........... selectedTtl is time limit, topology is graph.
    * Return: object of a GameController
    ******************************************************************* */
   public GameController(Stage stage, int tId, int rId, int selectedTtl, NetworkTopology topology) {
@@ -97,6 +101,65 @@ public class GameController extends BaseController implements PropertyChangeList
     configureNetwork(this.network);
     setupInteractions();
   }
+
+  /*********************************************************************
+   * Method: propertyChange
+   * Function: observer event trigger for packet and UI math updates.
+   * Parameters: evt contains packet and layout transition data.
+   * Return: void
+   ******************************************************************* */
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    String eventType = evt.getPropertyName();
+
+    Platform.runLater(() -> {
+
+      if (eventType.equals("ROUTER_PERMANENT")) {
+        int routerId = (int) evt.getOldValue();
+        view.updateRouterLabel(routerId, "PERMANENT");
+      }
+      else if (eventType.equals("UPDATE_LINK_LABEL")) {
+        int[] data = (int[]) evt.getNewValue();
+        view.updateLinkLabel(data[0], data[1], data[2], data[3]);
+      }
+      else if (eventType.equals("EXPLORE_LINK") || eventType.equals("CONFIRM_LINK")) {
+        int[] nodes = (int[]) evt.getNewValue();
+        String lineState = eventType.equals("EXPLORE_LINK") ? "EXPLORE" : "CONFIRM";
+        ImageView routerA = getRouterIcon(nodes[0]);
+        ImageView routerB = getRouterIcon(nodes[1]);
+        view.drawLink(routerA, routerB, lineState);
+      }
+      else if (eventType.equals("PACKET_SENT")) {
+        int sourceRouterId = (int) evt.getOldValue();
+        int[] packetData = (int[]) evt.getNewValue();
+        int destRouterId = packetData[0];
+        String ttlString = String.valueOf(packetData[1]);
+
+        animatePacket(getRouterIcon(sourceRouterId), getRouterIcon(destRouterId), ttlString);
+        this.view.getPacketCounterBox().setText(String.valueOf(Packet.globalPacketCount));
+      }
+      else if (eventType.equals("SUCCESS")) {
+        int routerId = (int) evt.getOldValue();
+        view.updateRouterLabel(routerId, "SUCCESS");
+      }
+
+    });
+  }
+
+  /*********************************************************************
+   * Method: getView
+   * Function: retrieves the managed interface view.
+   * Parameters: none.
+   * Return: object of a BaseView
+   ******************************************************************* */
+  @Override
+  public BaseView getView() {
+    return this.view;
+  }
+
+  // -------------------------------------------------------------------
+  // PROTECTED/PRIVATE LOW-LEVEL ABSTRACTION: Setup and UI Helpers
+  // -------------------------------------------------------------------
 
   /*********************************************************************
    * Method: configureNetwork
@@ -129,71 +192,14 @@ public class GameController extends BaseController implements PropertyChangeList
   }
 
   /*********************************************************************
-   * Method: propertyChange
-   * Function: observer event trigger for packet UI updates.
-   * Parameters: evt contains packet transition data.
-   * Return: void
-   ******************************************************************* */
-  @Override
-  public void propertyChange(PropertyChangeEvent evt) {
-    String eventType = evt.getPropertyName();
-
-    Platform.runLater(() -> {
-
-      if (eventType.equals("ROUTER_PERMANENT")) {
-        int routerId = (int) evt.getOldValue();
-        view.updateRouterLabel(routerId, "PERMANENT");
-      }
-      else if (eventType.equals("UPDATE_LINK_LABEL")) {
-        int[] data = (int[]) evt.getNewValue();
-        // data = {routerA, routerB, distance, predecessor}
-        view.updateLinkLabel(data[0], data[1], data[2], data[3]);
-      }
-      else if (eventType.equals("EXPLORE_LINK") || eventType.equals("CONFIRM_LINK")) {
-        int[] nodes = (int[]) evt.getNewValue();
-        String lineState = eventType.equals("EXPLORE_LINK") ? "EXPLORE" : "CONFIRM";
-
-        Platform.runLater(() -> {
-          // The Controller does the fetching...
-          ImageView routerA = getRouterIcon(nodes[0]);
-          ImageView routerB = getRouterIcon(nodes[1]);
-
-          // ...and the View just draws the result!
-          view.drawLink(routerA, routerB, lineState);
-        });
-      }
-
-      else if (eventType.equals("PACKET_SENT")) {
-        int sourceRouterId = (int) evt.getOldValue();
-        int[] packetData = (int[]) evt.getNewValue();
-
-        int destRouterId = packetData[0];
-        String ttlString = String.valueOf(packetData[1]);
-
-        animatePacket(getRouterIcon(sourceRouterId), getRouterIcon(destRouterId), ttlString);
-        this.view.getPacketCounterBox().setText(String.valueOf(Packet.globalPacketCount));
-      }
-
-      else if (eventType.equals("SUCCESS")) {
-        int routerId = (int) evt.getOldValue();
-        view.updateRouterLabel(routerId, "SUCCESS");
-      }
-
-    });
-  }
-
-  /*********************************************************************
    * Method: animatePacket
    * Function: generates smooth movement and TTL tracking on the UI.
    * Parameters: routerK is origin, routerJ is target, ttlText is counter.
    * Return: void
    ******************************************************************* */
   private void animatePacket(ImageView routerK, ImageView routerJ, String ttlText){
-
     ImageView packet = view.createNewPacket(routerK.getLayoutX(), routerK.getLayoutY());
-    Label ttlLabel;
-
-    ttlLabel = new Label("TTL: " + ttlText);
+    Label ttlLabel = new Label("TTL: " + ttlText);
 
     ttlLabel.setStyle("-fx-text-fill: black; -fx-font-weight: bold; -fx-font-size: 14px;");
     ttlLabel.setLayoutX(routerK.getLayoutX());
@@ -220,8 +226,14 @@ public class GameController extends BaseController implements PropertyChangeList
     timeline.play();
   }
 
+  /*********************************************************************
+   * Method: changeLinkLabel
+   * Function: updates connection information visually (Placeholder).
+   * Parameters: none.
+   * Return: void
+   ******************************************************************* */
   private void changeLinkLabel(){
-
+    // Unimplemented UI transition
   }
 
   /*********************************************************************
@@ -243,16 +255,4 @@ public class GameController extends BaseController implements PropertyChangeList
       default: return null;
     }
   }
-
-  /*********************************************************************
-   * Method: getView
-   * Function: retrieves the managed interface view.
-   * Parameters: none.
-   * Return: object of a BaseView
-   ******************************************************************* */
-  @Override
-  public BaseView getView() {
-    return this.view;
-  }
-
 }

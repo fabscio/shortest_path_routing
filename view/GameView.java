@@ -2,7 +2,7 @@
  * Author............: Fabricio da Silva Souza
  * Registration......: 202411217
  * Beginning.........: 28/03/2026
- * Last change.......:
+ * Last change.......: 09/04/2026
  * Program's name....: GameView
  * Program's function: Create the elements from the game interface
  *************************************************************** */
@@ -71,33 +71,11 @@ import controller.GameController;
 import controller.MenuController;
 import util.TopologyReader;
 
-
-/*a_label (109.1, 297.9)
-b_label (234.4, 156.2)
-c_label (910.5, 156.2)
-d_label (1030.9, 287.9)
-e_label (347.1, 287.9)
-f_label (784.6, 287.9)
-g_label (232.8, 432.1)
-h_label (910.5, 423.1)
-
-ab_label (70.0, 161.4)
-bc_label (570.0, 56.6)
-ag_label (70.0, 445.6)
-ge_label (411.6, 423.1)
-be_label (411.6, 174.3)
-gh_label (570.0, 520.7)
-dh_label (1070.1, 445.6)
-cd_label (1070.1, 161.4)
-fe_label (570.0, 228.9)
-fh_label (746.5, 423.1)
-fc_label (743.2, 174.3)*/
-
 public class GameView extends BaseView {
 
-  private ImageView router1, router2, router3, router4, router5, router6, router7, router8; // UI Network Endpoints
-  private Button startButton, changeButton;                                                 // UI Controls
-  private TextArea packetCounterBox;                                                        // UI Monitor box
+  private ImageView router1, router2, router3, router4, router5, router6, router7, router8;
+  private Button startButton, changeButton;
+  private TextArea packetCounterBox;
   private Label router1Label, router2Label, router3Label, router4Label, router5Label, router6Label, router7Label, router8Label;
   private Label link1Label, link2Label, link3Label, link4Label, link5Label, link6Label, link7Label, link8Label, link9Label, link10Label, link11Label;
 
@@ -174,60 +152,21 @@ public class GameView extends BaseView {
     addElementTo(packetCounterBox, layout);
 
     link1Label = createLabel("[∞, -]", 59.9, 22.5, 70.0, 161.4);
-    link2Label = createLabel("[∞, -]", 59.9, 22.5, 570.0, 56.6);    // bc_label
-    link3Label = createLabel("[∞, -]", 59.9, 22.5, 70.0, 445.6);    // ag_label
-    link4Label = createLabel("[∞, -]",59.9, 22.5, 411.6, 423.1);   // ge_label
-    link5Label = createLabel("[∞, -]",59.9, 22.5, 411.6, 174.3);   // be_label
-    link6Label = createLabel("[∞, -]",59.9, 22.5, 570.0, 520.7);   // gh_label
-    link7Label = createLabel("[∞, -]",59.9, 22.5, 1070.1, 445.6);  // dh_label
-    link8Label = createLabel("[∞, -]",59.9, 22.5, 1070.1, 161.4);  // cd_label
-    link9Label = createLabel("[∞, -]",59.9, 22.5, 570.0, 228.9);   // fe_label
-    link10Label = createLabel("[∞, -]",59.9, 22.5, 746.5, 423.1);  // fh_label
-    link11Label = createLabel("[∞, -]",59.9, 22.5, 743.2, 174.3);  // fc_label
+    link2Label = createLabel("[∞, -]", 59.9, 22.5, 570.0, 56.6);
+    link3Label = createLabel("[∞, -]", 59.9, 22.5, 70.0, 445.6);
+    link4Label = createLabel("[∞, -]",59.9, 22.5, 411.6, 423.1);
+    link5Label = createLabel("[∞, -]",59.9, 22.5, 411.6, 174.3);
+    link6Label = createLabel("[∞, -]",59.9, 22.5, 570.0, 520.7);
+    link7Label = createLabel("[∞, -]",59.9, 22.5, 1070.1, 445.6);
+    link8Label = createLabel("[∞, -]",59.9, 22.5, 1070.1, 161.4);
+    link9Label = createLabel("[∞, -]",59.9, 22.5, 570.0, 228.9);
+    link10Label = createLabel("[∞, -]",59.9, 22.5, 746.5, 423.1);
+    link11Label = createLabel("[∞, -]",59.9, 22.5, 743.2, 174.3);
   }
 
-  /*********************************************************************
-   * Method: bringRoutersToFront
-   * Function: secures visibility of assets against moving graphics.
-   * Parameters: none.
-   * Return: void
-   ******************************************************************* */
-  public void bringRoutersToFront() {
-    router1.toFront();
-    router2.toFront();
-    router3.toFront();
-    router4.toFront();
-    router5.toFront();
-    router6.toFront();
-    router7.toFront();
-    router8.toFront();
-  }
-
-  /*********************************************************************
-   * Method: createNewRouter
-   * Function: instantiates dynamic router node for UI view.
-   * Parameters: x and y position data.
-   * Return: ImageView of router.
-   ******************************************************************* */
-  public ImageView createNewRouter(double x, double y){
-    ImageView router = createImageViewElement("/router_icon.png", 63.1, 80.2);
-    applyPosition(router, x, y);
-    addElementTo(router, layout);
-    return router;
-  }
-
-  /*********************************************************************
-   * Method: createNewPacket
-   * Function: instantiates animating packet elements.
-   * Parameters: x and y position data.
-   * Return: ImageView of packet.
-   ******************************************************************* */
-  public ImageView createNewPacket(double x, double y){
-    ImageView packetGraphic = createImageViewElement("/packet_icon.png", 38.5, 32.2);
-    applyPosition(packetGraphic, x, y);
-    addElementTo(packetGraphic, layout);
-    return packetGraphic;
-  }
+  // -------------------------------------------------------------------
+  // HIGHER-LEVEL UI UPDATERS AND THEIR HELPERS
+  // -------------------------------------------------------------------
 
   /*********************************************************************
    * Method: updateRouterLabel
@@ -240,9 +179,22 @@ public class GameView extends BaseView {
       if (state.equals("PERMANENT")) {
         target.setStyle("-fx-text-fill: #2ecc71; -fx-background-color: #2c3e50; -fx-alignment: center; -fx-font-weight: bold; -fx-font-size: 12px; -fx-background-radius: 5px; -fx-border-color: #2ecc71; -fx-border-radius: 5px;");
       } else if (state.equals("SUCCESS")) {
-        // Bright gold styling for the final destination node!
         target.setStyle("-fx-text-fill: #f1c40f; -fx-background-color: #2c3e50; -fx-alignment: center; -fx-font-weight: bold; -fx-font-size: 12px; -fx-background-radius: 5px; -fx-border-color: #f1c40f; -fx-border-radius: 5px;");
       }
+    }
+  }
+
+  /*********************************************************************
+   * Method: getRouterLabel
+   * Function: Internal helper to map an ID to its specific Label.
+   ******************************************************************* */
+  public Label getRouterLabel(int routerId) {
+    switch (routerId) {
+      case 1: return router1Label; case 2: return router2Label;
+      case 3: return router3Label; case 4: return router4Label;
+      case 5: return router5Label; case 6: return router6Label;
+      case 7: return router7Label; case 8: return router8Label;
+      default: return null;
     }
   }
 
@@ -258,44 +210,10 @@ public class GameView extends BaseView {
   }
 
   /*********************************************************************
-   * Method: drawLink
-   * Function: Draws the white/red lines between two visual router nodes
+   * Method: getLinkLabel
+   * Function: Internal helper to map a cable connection to its Label.
    ******************************************************************* */
-  public void drawLink(ImageView rA, ImageView rB, String state) {
-    if (rA != null && rB != null) {
-      Line line = new Line();
-
-      // Calculate the exact center of the router icons
-      line.setStartX(rA.getLayoutX() + (63.1 / 2));
-      line.setStartY(rA.getLayoutY() + (80.2 / 2));
-      line.setEndX(rB.getLayoutX() + (63.1 / 2));
-      line.setEndY(rB.getLayoutY() + (80.2 / 2));
-      line.setStrokeWidth(4.0);
-
-      if (state.equals("EXPLORE")) {
-        line.setStyle("-fx-stroke: white; -fx-stroke-dash-array: 10 10;");
-      } else if (state.equals("CONFIRM")) {
-        line.setStyle("-fx-stroke: #e74c3c;");
-      }
-
-      addElementTo(line, layout);
-      bringRoutersToFront(); // Keeps routers above the lines!
-    }
-  }
-
-  // --- UI FETCH HELPERS ---
-  public Label getRouterLabel(int routerId) {
-    switch (routerId) {
-      case 1: return router1Label; case 2: return router2Label;
-      case 3: return router3Label; case 4: return router4Label;
-      case 5: return router5Label; case 6: return router6Label;
-      case 7: return router7Label; case 8: return router8Label;
-      default: return null;
-    }
-  }
-
   public Label getLinkLabel(int rA, int rB) {
-    // Matches your hardcoded layout mapping!
     if ((rA == 1 && rB == 2) || (rA == 2 && rB == 1)) return link1Label;
     if ((rA == 2 && rB == 3) || (rA == 3 && rB == 2)) return link2Label;
     if ((rA == 1 && rB == 7) || (rA == 7 && rB == 1)) return link3Label;
@@ -310,7 +228,70 @@ public class GameView extends BaseView {
     return null;
   }
 
-  // Getters Section
+  // -------------------------------------------------------------------
+  // INDEPENDENT DRAWING METHODS
+  // -------------------------------------------------------------------
+
+  /*********************************************************************
+   * Method: drawLink
+   * Function: Draws the white/red lines between two visual router nodes
+   ******************************************************************* */
+  public void drawLink(ImageView rA, ImageView rB, String state) {
+    if (rA != null && rB != null) {
+      Line line = new Line();
+
+      line.setStartX(rA.getLayoutX() + (63.1 / 2));
+      line.setStartY(rA.getLayoutY() + (80.2 / 2));
+      line.setEndX(rB.getLayoutX() + (63.1 / 2));
+      line.setEndY(rB.getLayoutY() + (80.2 / 2));
+      line.setStrokeWidth(4.0);
+
+      if (state.equals("EXPLORE")) {
+        line.setStyle("-fx-stroke: white; -fx-stroke-dash-array: 10 10;");
+      } else if (state.equals("CONFIRM")) {
+        line.setStyle("-fx-stroke: #e74c3c;");
+      }
+
+      addElementTo(line, layout);
+      bringRoutersToFront();
+    }
+  }
+
+  /*********************************************************************
+   * Method: bringRoutersToFront
+   * Function: secures visibility of assets against moving graphics.
+   ******************************************************************* */
+  public void bringRoutersToFront() {
+    router1.toFront(); router2.toFront(); router3.toFront(); router4.toFront();
+    router5.toFront(); router6.toFront(); router7.toFront(); router8.toFront();
+  }
+
+  /*********************************************************************
+   * Method: createNewRouter
+   * Function: instantiates dynamic router node for UI view.
+   ******************************************************************* */
+  public ImageView createNewRouter(double x, double y){
+    ImageView router = createImageViewElement("/router_icon.png", 63.1, 80.2);
+    applyPosition(router, x, y);
+    addElementTo(router, layout);
+    return router;
+  }
+
+  /*********************************************************************
+   * Method: createNewPacket
+   * Function: instantiates animating packet elements.
+   ******************************************************************* */
+  public ImageView createNewPacket(double x, double y){
+    ImageView packetGraphic = createImageViewElement("/packet_icon.png", 38.5, 32.2);
+    applyPosition(packetGraphic, x, y);
+    addElementTo(packetGraphic, layout);
+    return packetGraphic;
+  }
+
+  // -------------------------------------------------------------------
+  // PUBLIC GETTERS
+  // -------------------------------------------------------------------
+
   public Button getStartButton(){ return startButton; }
   public Button getChangeButton(){ return changeButton; }
   public TextArea getPacketCounterBox(){ return packetCounterBox; }

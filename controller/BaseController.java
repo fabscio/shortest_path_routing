@@ -2,7 +2,7 @@
  * Author............: Fabricio da Silva Souza
  * Registration......: 202411217
  * Beginning.........: 28/03/2026
- * Last change.......:
+ * Last change.......: 09/04/2026
  * Program's name....: BaseController
  * Program's function: super class that works as base for all
  * ................... controllers.
@@ -73,7 +73,7 @@ import util.TopologyReader;
 
 public abstract class BaseController {
 
-  protected Stage stage; // JavaFX window context
+  protected Stage stage;
 
   /*********************************************************************
    * Method: BaseController
@@ -97,18 +97,18 @@ public abstract class BaseController {
   }
 
   /*********************************************************************
-   * Method: setupInteractions
-   * Function: abstract method to initialize event listeners.
-   * Parameters: none.
-   * Return: void
-   ******************************************************************* */
-  protected abstract void setupInteractions();
-
-  /*********************************************************************
    * Method: getView
    * Function: abstract method to retrieve the controlled view.
    * Parameters: none.
    * Return: object of a BaseView
    ******************************************************************* */
   public abstract BaseView getView();
+
+  /*********************************************************************
+   * Method: setupInteractions
+   * Function: abstract method to initialize event listeners.
+   * Parameters: none.
+   * Return: void
+   ******************************************************************* */
+  protected abstract void setupInteractions();
 }
