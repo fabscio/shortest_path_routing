@@ -136,12 +136,49 @@ public class GameController extends BaseController implements PropertyChangeList
    ******************************************************************* */
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
-    int routerKId = (int) evt.getOldValue();
-    int routerJId = (int) evt.getNewValue();
+    String eventType = evt.getPropertyName();
 
-    Platform.runLater( () -> {
-      animatePacket(getRouterIcon(routerKId), getRouterIcon(routerJId), evt.getPropertyName());
-      this.view.getPacketCounterBox().setText(String.valueOf(Packet.globalPacketCount));
+    Platform.runLater(() -> {
+
+      if (eventType.equals("ROUTER_PERMANENT")) {
+        int routerId = (int) evt.getOldValue();
+        view.updateRouterLabel(routerId, "PERMANENT");
+      }
+      else if (eventType.equals("UPDATE_LINK_LABEL")) {
+        int[] data = (int[]) evt.getNewValue();
+        // data = {routerA, routerB, distance, predecessor}
+        view.updateLinkLabel(data[0], data[1], data[2], data[3]);
+      }
+      else if (eventType.equals("EXPLORE_LINK") || eventType.equals("CONFIRM_LINK")) {
+        int[] nodes = (int[]) evt.getNewValue();
+        String lineState = eventType.equals("EXPLORE_LINK") ? "EXPLORE" : "CONFIRM";
+
+        Platform.runLater(() -> {
+          // The Controller does the fetching...
+          ImageView routerA = getRouterIcon(nodes[0]);
+          ImageView routerB = getRouterIcon(nodes[1]);
+
+          // ...and the View just draws the result!
+          view.drawLink(routerA, routerB, lineState);
+        });
+      }
+
+      else if (eventType.equals("PACKET_SENT")) {
+        int sourceRouterId = (int) evt.getOldValue();
+        int[] packetData = (int[]) evt.getNewValue();
+
+        int destRouterId = packetData[0];
+        String ttlString = String.valueOf(packetData[1]);
+
+        animatePacket(getRouterIcon(sourceRouterId), getRouterIcon(destRouterId), ttlString);
+        this.view.getPacketCounterBox().setText(String.valueOf(Packet.globalPacketCount));
+      }
+
+      else if (eventType.equals("SUCCESS")) {
+        int routerId = (int) evt.getOldValue();
+        view.updateRouterLabel(routerId, "SUCCESS");
+      }
+
     });
   }
 

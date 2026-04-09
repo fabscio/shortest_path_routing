@@ -79,6 +79,8 @@ public class Router implements Runnable {
   private final BlockingQueue<Packet> inbox;                       // Thread-safe queue for incoming packets
   private volatile boolean isRunning = true;                       // Flag to control the main execution loop
   private final HashMap<Integer, List<Integer>> seenPacketsLedger; // Memory ledger for processed packets
+  private int[][] adjacencyMatrix;
+  private int totalRouters;
 
   /*********************************************************************
    * Method: Router
@@ -129,11 +131,117 @@ public class Router implements Runnable {
    * Return: void
    ******************************************************************* */
   public void shortestPathRouting(Packet incomingPacket){
-    Packet clonedPacket = clonePacket(incomingPacket);
-
-    for(int i = 0; i < links.size(); i++){
-      sendPacketTo(links.get(i).getOppositeRouter(this), clonedPacket);
+    // 1. If we reached the final destination, shout SUCCESS!
+    if (this.id == incomingPacket.getDestinationRouterId()) {
+      support.firePropertyChange("SUCCESS", this.id, null);
+      return;
     }
+
+    boolean isTransmitter = (incomingPacket.getPreviousRouterId() == 0);
+    int nextHopId = getNextHopDijkstra(this.id, incomingPacket.getDestinationRouterId(), isTransmitter);
+
+    if (nextHopId != -1) {
+      for (Link link : links) {
+        Router neighbor = link.getOppositeRouter(this);
+        if (neighbor.getId() == nextHopId) {
+          Packet clonedPacket = clonePacket(incomingPacket);
+          clonedPacket.setPreviousRouterId(this.id);
+          sendPacketTo(neighbor, clonedPacket);
+          break;
+        }
+      }
+    }
+  }
+
+  public void loadTopologyForDijkstra(NetworkTopology topology) {
+    this.totalRouters = topology.getNumRouters();
+    this.adjacencyMatrix = new int[totalRouters][totalRouters];
+    for (int[] edge : topology.getNodes()) {
+      int rA = edge[0] - 1; int rB = edge[1] - 1; int weight = edge[2];
+      this.adjacencyMatrix[rA][rB] = weight;
+      this.adjacencyMatrix[rB][rA] = weight;
+    }
+  }
+
+  private int getNextHopDijkstra(int sourceId, int targetId, boolean visualize) {
+    int INFINITY = 1000000000;
+    int s = sourceId - 1; int t = targetId - 1;
+
+    class NodeState {
+      int predecessor = -1; int length = INFINITY; boolean isPermanent = false;
+    }
+
+    NodeState[] state = new NodeState[this.totalRouters];
+    for (int i = 0; i < this.totalRouters; i++) state[i] = new NodeState();
+
+    state[s].length = 0;
+    state[s].isPermanent = true;
+
+    if (visualize) {
+      support.firePropertyChange("ROUTER_PERMANENT", s + 1, null);
+      sleep(750);
+    }
+
+    int k = s;
+    do {
+      for (int i = 0; i < this.totalRouters; i++) {
+        if (this.adjacencyMatrix[k][i] != 0 && !state[i].isPermanent) {
+
+          // 1. Draw the white dashed line to explore the adjacent neighbor
+          if (visualize) {
+            int[] exploreData = {k + 1, i + 1};
+            support.firePropertyChange("EXPLORE_LINK", 0, exploreData);
+            sleep(750);
+          }
+
+          if (state[k].length + this.adjacencyMatrix[k][i] < state[i].length) {
+            state[i].predecessor = k;
+            state[i].length = state[k].length + this.adjacencyMatrix[k][i];
+
+            // 2. Update the [distance, predecessor] label under the link!
+            if (visualize) {
+              int[] labelData = {k + 1, i + 1, state[i].length, k + 1};
+              support.firePropertyChange("UPDATE_LINK_LABEL", 0, labelData);
+              sleep(500);
+            }
+          }
+        }
+      }
+
+      k = -1;
+      int min = INFINITY;
+      for (int i = 0; i < this.totalRouters; i++) {
+        if (!state[i].isPermanent && state[i].length < min) {
+          min = state[i].length;
+          k = i;
+        }
+      }
+
+      if (k == -1) break;
+
+      // 3. Mark the smallest one as the new Permanent
+      state[k].isPermanent = true;
+      if (visualize) {
+        support.firePropertyChange("ROUTER_PERMANENT", k + 1, null);
+        if (state[k].predecessor != -1) {
+          int[] confirmData = {state[k].predecessor + 1, k + 1};
+          support.firePropertyChange("CONFIRM_LINK", 0, confirmData);
+        }
+        sleep(750);
+      }
+
+    } while (k != t);
+
+    if (state[t].predecessor != -1) {
+      int step = t;
+      while (state[step].predecessor != s) step = state[step].predecessor;
+      return step + 1;
+    }
+    return -1;
+  }
+
+  private void sleep(int millis) {
+    try { Thread.sleep(millis); } catch (InterruptedException ignored) {}
   }
 
   /*********************************************************************
@@ -166,11 +274,11 @@ public class Router implements Runnable {
    * Return: void
    ******************************************************************* */
   public void sendPacketTo(Router destinationRouter, Packet packet){
-    if(this.id == packet.getDestinationRouterId()) {
-      return;
-    }
+    // 2. Pack the Destination ID and the TTL into an array
+    int[] packetData = { destinationRouter.getId(), packet.getTTL() };
 
-    support.firePropertyChange(String.valueOf(packet.getTTL()), this.id, destinationRouter.getId());
+    // 3. Fire the correct "PACKET_SENT" event the controller is waiting for
+    support.firePropertyChange("PACKET_SENT", this.id, packetData);
 
     new Thread(() -> {
       try {

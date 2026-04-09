@@ -89,7 +89,8 @@ public class Network implements Runnable{
    * Return: object of a Network
    ******************************************************************* */
   public Network(int routersAmount, int[][] nodes){
-    this.routers = configureRouters(routersAmount);
+    // UPDATE: Pass the 'nodes' array down into configureRouters!
+    this.routers = configureRouters(routersAmount, nodes);
     this.links = estabilishLinks(nodes);
   }
 
@@ -166,11 +167,18 @@ public class Network implements Runnable{
    * Parameters: amount is total routers, selectedVersion is algorithm.
    * Return: List of instantiated routers
    ******************************************************************* */
-  private List<Router> configureRouters(int amount){
+  private List<Router> configureRouters(int amount, int[][] nodes){
     List<Router> initializedRouters = new ArrayList<>();
+
+    // NEW: Create a temporary topology wrapper just for the routers to read
+    NetworkTopology tempTopology = new NetworkTopology(amount, nodes);
 
     for(int i = 0; i < amount ; i++){
       Router r = new Router(i + 1);
+
+      // CRITICAL FIX: Inject the map into the router's brain!
+      r.loadTopologyForDijkstra(tempTopology);
+
       initializedRouters.add(r);
 
       Thread t = new Thread(r);
