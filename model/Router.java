@@ -364,23 +364,4 @@ public class Router implements Runnable {
     return newPacket;
   }
 
-  /*********************************************************************
-   * Method: checkTTL
-   * Function: verifies if a packet's Time-To-Live has expired.
-   * Parameters: packet is the packet to check.
-   * Return: boolean indicating if TTL is zero or less.
-   ******************************************************************* */
-  private boolean checkTTL(Packet packet){
-    return (packet.getTTL() <= 0);
-  }
-
-  /*********************************************************************
-   * Method: sleep
-   * Function: pauses thread execution to allow UI animations.
-   * Parameters: millis is time in milliseconds.
-   * Return: void
-   ******************************************************************* */
-  private void sleep(int millis) {
-    try { Thread.sleep(millis); } catch (InterruptedException ignored) {}
-  }
 }
