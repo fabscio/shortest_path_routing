@@ -215,6 +215,17 @@ public class Router implements Runnable {
         Router neighbor = link.getOppositeRouter(this);
         if (neighbor.getId() == nextHopId) {
           Packet clonedPacket = clonePacket(incomingPacket);
+          if(clonedPacket.getTTL() < 0) {
+            Platform.runLater(() -> {
+              Alert alert = new Alert(Alert.AlertType.WARNING);
+              alert.setTitle("ERROR");
+              alert.setHeaderText("PACKET DIED");
+              alert.setContentText("THE PACKET DIED IN THE NETWORK BEFORE REACHING THE RECEPTOR ROUTER");
+              alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+              alert.show();
+            });
+            return;
+          }
           clonedPacket.setPreviousRouterId(this.id);
           sendPacketTo(neighbor, clonedPacket);
           break;
@@ -246,7 +257,11 @@ public class Router implements Runnable {
 
     if (visualize) {
       support.firePropertyChange("ROUTER_PERMANENT", s + 1, null);
-      sleep(750);
+      try {
+        Thread.sleep(750);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     int k = s;
@@ -257,7 +272,11 @@ public class Router implements Runnable {
           if (visualize) {
             int[] exploreData = {k + 1, i + 1};
             support.firePropertyChange("EXPLORE_LINK", 0, exploreData);
-            sleep(750);
+            try {
+              Thread.sleep(750);
+            } catch (InterruptedException e) {
+              throw new RuntimeException(e);
+            }
           }
 
           if (state[k].length + this.adjacencyMatrix[k][i] < state[i].length) {
@@ -267,7 +286,11 @@ public class Router implements Runnable {
             if (visualize) {
               int[] labelData = {k + 1, i + 1, state[i].length, k + 1};
               support.firePropertyChange("UPDATE_LINK_LABEL", 0, labelData);
-              sleep(500);
+              try {
+                Thread.sleep(500);
+              } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+              }
             }
           }
         }
@@ -291,7 +314,11 @@ public class Router implements Runnable {
           int[] confirmData = {state[k].predecessor + 1, k + 1};
           support.firePropertyChange("CONFIRM_LINK", 0, confirmData);
         }
-        sleep(750);
+        try {
+          Thread.sleep(750);
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
       }
 
     } while (k != t);

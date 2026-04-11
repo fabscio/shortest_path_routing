@@ -175,10 +175,11 @@ public class GameView extends BaseView {
   public void updateRouterLabel(int routerId, String state) {
     Label target = getRouterLabel(routerId);
     if (target != null) {
-      target.setText("R" + routerId + " IS " + state);
       if (state.equals("PERMANENT")) {
+        target.setText("R" + routerId + " IS " + state);
         target.setStyle("-fx-text-fill: #2ecc71; -fx-background-color: #2c3e50; -fx-alignment: center; -fx-font-weight: bold; -fx-font-size: 12px; -fx-background-radius: 5px; -fx-border-color: #2ecc71; -fx-border-radius: 5px;");
       } else if (state.equals("SUCCESS")) {
+        target.setText(state);
         target.setStyle("-fx-text-fill: #f1c40f; -fx-background-color: #2c3e50; -fx-alignment: center; -fx-font-weight: bold; -fx-font-size: 12px; -fx-background-radius: 5px; -fx-border-color: #f1c40f; -fx-border-radius: 5px;");
       }
     }
